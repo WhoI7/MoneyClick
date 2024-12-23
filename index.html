@@ -5,102 +5,138 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link type="text/css" href="css/style.css" rel="stylesheet">
     <meta charset="UTF-8">
-    <!-- Telegram Game Platform -->
-    <script src="https://telegram.org/js/games.js"></script>
 </head>
 <body>
-    <div class="back">
-        <!-- Ваша гра -->
+<div class="back">
+    <div class="table">
+        <div class="otstup"></div>
+        <div class="points">
+            <span class="text">Ваш рахунок:</span>
+            <span id="score" class="text">0</span>
+        </div>
+        <div class="otstup"></div>
+        <div class="time">
+            <span>Відлік </span>
+            <span id="timer" class="text">30</span>
+        </div>
+        <div class="moneys">
+            <div class="line1">
+                <button class="money1" onclick="handleClick(this)">
+                    <span class="money-text">10</span>
+                </button>
+                <button class="money1" onclick="handleClick(this)">
+                    <span class="money-text">20</span>
+                </button>
+                <button class="money1" onclick="handleClick(this)">
+                    <span class="money-text">30</span>
+                </button>
+            </div>
+            <div class="line2">
+                <button class="money2" onclick="handleClick(this)">
+                    <span class="money-text">50</span>
+                </button>
+                <button class="money2" onclick="handleClick(this)">
+                    <span class="money-text">100</span>
+                </button>
+            </div>
+        </div>
     </div>
-    <div id="result-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-        <h1>Результат: <span id="final-score">0</span></h1>
-        <button onclick="startGame()">Старт</button>
-    </div>
+</div>
+<div id="result-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+    <h1>Результат: <span id="final-score">0</span></h1>
+    <button onclick="startGame()">Грати знову</button>
+</div>
+<script>
+    let score = 0;
+    let timeLeft = 30;
+    let gameStarted = false;
 
-    <script>
-        let score = 0;
-        let timeLeft = 30;
-        let gameStarted = false;
-
-        function updateTimer() {
-            const timerElement = document.getElementById('timer');
-            if (timeLeft > 0) {
-                timeLeft--;
-                timerElement.textContent = timeLeft;
-            } else {
-                endGame();
-            }
+    function updateTimer() {
+        const timerElement = document.getElementById('timer');
+        if (timeLeft > 0) {
+            timeLeft--;
+            timerElement.textContent = timeLeft;
+        } else {
+            endGame();
         }
+    }
 
-        function handleClick(button) {
-            if (timeLeft > 0) {
-                const value = parseInt(button.querySelector('.money-text').textContent, 10);
-                score += value;
-                document.getElementById('score').textContent = score;
-            }
-        }
-
-        function randomizeValues() {
-            if (timeLeft > 0) {
-                const buttons = document.querySelectorAll('.money1, .money2');
-                buttons.forEach(button => {
-                    const isPositive = Math.random() > 0.5;
-                    const value = isPositive
-                        ? Math.floor(Math.random() * (10 - 5 + 1)) + 5
-                        : Math.floor(Math.random() * (60 - 40 + 1)) + 40 * -1;
-                    button.querySelector('.money-text').textContent = value;
-                    button.style.backgroundImage = isPositive
-                        ? "url('img/moneyplus.png')"
-                        : "url('img/moneyminus.png')";
-                });
-            }
-        }
-
-        function endGame() {
-            clearInterval(timerInterval);
-            clearInterval(randomInterval);
-            document.getElementById('timer').textContent = 0;
-            document.getElementById('final-score').textContent = score;
-            document.getElementById('result-screen').style.display = 'flex';
-
-            // Передача результату в Telegram
-            sendResultToTelegram(score);
-        }
-
-        function sendResultToTelegram(score) {
-            if (window.TelegramGameProxy) {
-                try {
-                    TelegramGameProxy.postEvent('score', score); // Відправляємо результат
-                    console.log('Результат передано Telegram:', score);
-                } catch (error) {
-                    console.error('Помилка передачі результату через TelegramGameProxy:', error);
-                }
-            } else {
-                console.error('TelegramGameProxy недоступний.');
-            }
-        }
-
-        function startGame() {
-            clearInterval(timerInterval);
-            clearInterval(randomInterval);
-            score = 0;
-            timeLeft = 30;
-            gameStarted = false;
-
+    function handleClick(button) {
+        if (timeLeft > 0) {
+            const value = parseInt(button.querySelector('.money-text').textContent, 10);
+            score += value;
             document.getElementById('score').textContent = score;
-            document.getElementById('timer').textContent = timeLeft;
-            document.getElementById('result-screen').style.display = 'none';
-
-            if (!gameStarted) {
-                gameStarted = true;
-                randomizeValues();
-                timerInterval = setInterval(updateTimer, 1000);
-                randomInterval = setInterval(randomizeValues, 3000);
-            }
         }
+    }
 
-        let timerInterval;
-        let randomInterval;
-    </script>
+    function randomizeValues() {
+        if (timeLeft > 0) {
+            const buttons = document.querySelectorAll('.money1, .money2');
+            buttons.forEach(button => {
+                const isPositive = Math.random() > 0.5;
+                const value = isPositive
+                    ? Math.floor(Math.random() * (10 - 5 + 1)) + 5
+                    : Math.floor(Math.random() * (60 - 40 + 1)) + 40 * -1;
+                button.querySelector('.money-text').textContent = value;
+                button.style.backgroundImage = isPositive
+                    ? "url('img/moneyplus.png')"
+                    : "url('img/moneyminus.png')";
+            });
+        }
+    }
+
+    function sendResultToBot(score) {
+        if (window.TelegramGameProxy) {
+            try {
+                TelegramGameProxy.postEvent('score', score);
+                console.log('Результат успішно передано боту:', score);
+            } catch (error) {
+                console.error('Помилка передачі результату через TelegramGameProxy:', error);
+            }
+        } else {
+            console.error('TelegramGameProxy недоступний.');
+        }
+    }
+
+    function endGame() {
+        clearInterval(timerInterval);
+        clearInterval(randomInterval);
+        document.getElementById('timer').textContent = 0;
+        document.getElementById('final-score').textContent = score;
+        document.getElementById('result-screen').style.display = 'flex';
+
+        // Передача результату боту
+        sendResultToBot(score);
+    }
+
+    function restartGame() {
+        score = 0;
+        timeLeft = 30;
+        gameStarted = false;
+        document.getElementById('score').textContent = score;
+        document.getElementById('timer').textContent = timeLeft;
+        document.getElementById('result-screen').style.display = 'none';
+    }
+
+    function startGame() {
+        // Скидання попередніх інтервалів та значень
+        clearInterval(timerInterval);
+        clearInterval(randomInterval);
+
+        // Перезапуск гри
+        restartGame();
+
+        if (!gameStarted) {
+            gameStarted = true;
+            randomizeValues();
+            timerInterval = setInterval(updateTimer, 1000);
+            randomInterval = setInterval(randomizeValues, 3000);
+            document.getElementById('result-screen').style.display = 'none';
+        }
+    }
+
+    let timerInterval;
+    let randomInterval;
+</script>
 </body>
 </html>
