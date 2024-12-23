@@ -1,4 +1,3 @@
-/* Основні стилі */
 body {
     margin: 0;
     height: 100vh;
@@ -60,6 +59,7 @@ body {
     background-size: contain;
     border: none;
     cursor: pointer;
+    image-rendering: pixelated;
     width: 30%; /* Розмір від ширини контейнера */
     aspect-ratio: 1; /* Зберігає квадратну форму */
     margin: 0 1%; /* Відступи між кнопками */
