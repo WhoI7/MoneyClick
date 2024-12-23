@@ -92,6 +92,8 @@
         document.getElementById('timer').textContent = 0;
         document.getElementById('final-score').textContent = score;
         document.getElementById('result-screen').style.display = 'flex';
+
+         sendResultToBot(score);
     }
 
     function restartGame() {
@@ -108,6 +110,13 @@
             alert('Результат поділено!');
         });
     }
+function sendResultToBot(score) {
+    if (window.Telegram && Telegram.WebApp) {
+        Telegram.WebApp.sendData(JSON.stringify({ finalScore: score }));
+    } else {
+        console.error("Telegram WebApp API is not available.");
+    }
+}
 
     function startGame() {
         // Скидання попередніх інтервалів та значень
