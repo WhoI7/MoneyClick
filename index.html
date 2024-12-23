@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link type="text/css" href="css/style.css" rel="stylesheet">
     <meta charset="UTF-8">
+    <!-- Telegram Game Platform -->
+    <script src="https://telegram.org/js/games.js"></script>
 </head>
 <body>
 <div class="back">
@@ -16,7 +18,7 @@
         </div>
         <div class="otstup"></div>
         <div class="time">
-            <span>Відлік </span>
+            <span>Відлік:</span>
             <span id="timer" class="text">30</span>
         </div>
         <div class="moneys">
@@ -44,8 +46,7 @@
 </div>
 <div id="result-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center;">
     <h1>Результат: <span id="final-score">0</span></h1>
-    <button onclick="startGame()">Старт</button>
-    <button onclick="shareResult()">Поділитися результатом</button>
+    <button onclick="startGame()">Грати знову</button>
 </div>
 <script>
     let score = 0;
@@ -86,12 +87,28 @@
         }
     }
 
+    function sendResultToBot(score) {
+        if (window.TelegramGameProxy) {
+            try {
+                TelegramGameProxy.postEvent('score', score); // Передаємо результат
+                console.log('Результат успішно передано боту:', score);
+            } catch (error) {
+                console.error('Помилка передачі результату через TelegramGameProxy:', error);
+            }
+        } else {
+            console.error('TelegramGameProxy недоступний.');
+        }
+    }
+
     function endGame() {
         clearInterval(timerInterval);
         clearInterval(randomInterval);
         document.getElementById('timer').textContent = 0;
         document.getElementById('final-score').textContent = score;
         document.getElementById('result-screen').style.display = 'flex';
+
+        // Передача результату боту
+        sendResultToBot(score);
     }
 
     function restartGame() {
@@ -103,18 +120,10 @@
         document.getElementById('result-screen').style.display = 'none';
     }
 
-    function shareResult() {
-        TelegramGameProxy.shareScore(score, () => {
-            alert('Результат поділено!');
-        });
-    }
-
     function startGame() {
-        // Скидання попередніх інтервалів та значень
         clearInterval(timerInterval);
         clearInterval(randomInterval);
 
-        // Перезапуск гри
         restartGame();
 
         if (!gameStarted) {
@@ -122,10 +131,8 @@
             randomizeValues();
             timerInterval = setInterval(updateTimer, 1000);
             randomInterval = setInterval(randomizeValues, 3000);
-            document.getElementById('result-screen').style.display = 'none';
         }
     }
-
 
     let timerInterval;
     let randomInterval;
