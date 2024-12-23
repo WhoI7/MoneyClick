@@ -110,14 +110,22 @@
     }
 
     function startGame() {
+        // Скидання попередніх інтервалів та значень
+        clearInterval(timerInterval);
+        clearInterval(randomInterval);
+
+        // Перезапуск гри
+        restartGame();
+
         if (!gameStarted) {
             gameStarted = true;
-            randomizeValues()
+            randomizeValues();
             timerInterval = setInterval(updateTimer, 1000);
             randomInterval = setInterval(randomizeValues, 3000);
             document.getElementById('result-screen').style.display = 'none';
         }
     }
+
 
     let timerInterval;
     let randomInterval;
