@@ -112,6 +112,7 @@
     function startGame() {
         if (!gameStarted) {
             gameStarted = true;
+            randomizeValues()
             timerInterval = setInterval(updateTimer, 1000);
             randomInterval = setInterval(randomizeValues, 3000);
             document.getElementById('result-screen').style.display = 'none';
