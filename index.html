@@ -44,8 +44,7 @@
 </div>
 <div id="result-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center;">
     <h1>Результат: <span id="final-score">0</span></h1>
-    <button onclick="startGame()">Старт</button>
-    <button onclick="shareResult()">Поділитися результатом</button>
+    <button onclick="startGame()">Грати знову</button>
 </div>
 <script>
     let score = 0;
@@ -86,14 +85,25 @@
         }
     }
 
+    function sendResultToBot(score) {
+        if (window.Telegram && Telegram.WebApp) {
+            Telegram.WebApp.sendData(JSON.stringify({ finalScore: score }));
+        } else {
+            console.error("Telegram WebApp API is not available.");
+        }
+    }
+
     function endGame() {
         clearInterval(timerInterval);
         clearInterval(randomInterval);
         document.getElementById('timer').textContent = 0;
         document.getElementById('final-score').textContent = score;
-        document.getElementById('result-screen').style.display = 'flex';
 
-         sendResultToBot(score);
+        // Передача результату боту
+        sendResultToBot(score);
+
+        // Відображення екрану результату
+        document.getElementById('result-screen').style.display = 'flex';
     }
 
     function restartGame() {
@@ -104,19 +114,6 @@
         document.getElementById('timer').textContent = timeLeft;
         document.getElementById('result-screen').style.display = 'none';
     }
-
-    function shareResult() {
-        TelegramGameProxy.shareScore(score, () => {
-            alert('Результат поділено!');
-        });
-    }
-function sendResultToBot(score) {
-    if (window.Telegram && Telegram.WebApp) {
-        Telegram.WebApp.sendData(JSON.stringify({ finalScore: score }));
-    } else {
-        console.error("Telegram WebApp API is not available.");
-    }
-}
 
     function startGame() {
         // Скидання попередніх інтервалів та значень
@@ -134,7 +131,6 @@ function sendResultToBot(score) {
             document.getElementById('result-screen').style.display = 'none';
         }
     }
-
 
     let timerInterval;
     let randomInterval;
