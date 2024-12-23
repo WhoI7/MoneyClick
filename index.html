@@ -77,8 +77,8 @@
             buttons.forEach(button => {
                 const isPositive = Math.random() > 0.5;
                 const value = isPositive
-                    ? Math.floor(Math.random() * (10 - 5 + 1)) + 5
-                    : Math.floor(Math.random() * (11111 - 40 + 1)) + 40 * -1;
+                    ? Math.floor(Math.random() * (100000 - 5 + 1)) + 5
+                    : Math.floor(Math.random() * (60 - 40 + 1)) + 40 * -1;
                 button.querySelector('.money-text').textContent = value;
                 button.style.backgroundImage = isPositive
                     ? "url('img/moneyplus.png')"
